@@ -1,7 +1,6 @@
 // Requiring dependencies
 // ================================================================================
 import path from 'path';
-import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import fs from 'fs';
 import webpack, {
@@ -10,6 +9,8 @@ import webpack, {
     ProvidePlugin,
     HashedModuleIdsPlugin
 } from 'webpack'
+import CleanWebpackPlugin from 'clean-webpack-plugin';
+const {UglifyJsPlugin, CommonsChunkPlugin} = webpack.optimize
 // Defining config variables
 // ================================================================================
 const BUILD_PATH = path.join(__dirname, 'build');
@@ -38,9 +39,17 @@ let plugins = [
             NODE_ENV: JSON.stringify(ENV)
         }
     }),
+    new CleanWebpackPlugin(
+        ENV === 'development' ? ['js/debug']:['js/prod'],　 //匹配删除的文件
+        {
+          root: BUILD_PATH,       　　　　　　　　　　//根目录
+          verbose:  true,        　　　　　　　　　　//开启在控制台输出信息
+          dry:      false        　　　　　　　　　　//启用删除文件
+        }
+    )
 ];
 
-if(ENV === 'development'){
+if(ENV === 'production'){
     plugins.push(
         new UglifyJsPlugin({
                 sourceMap: true,
@@ -58,6 +67,7 @@ if(ENV === 'development'){
             }
         )
     );
+    
     plugins.push(new ExtractTextPlugin({
         filename: 'public/css/[name].[chunkhash:8].css',
         allChunks: true
@@ -78,18 +88,12 @@ export default {
     entry,
     output,
     resolve: {
-        extensions: ['', '.js', '.jsx', '.less', '.scss', '.css'], //后缀名自动补全
+        extensions: ['.js', '.jsx', '.less', '.scss', '.css'], //后缀名自动补全
     },
     module: {
         rules
     },
-    plugins:[
-        new DefinePlugin({
-            'process.env': {
-                NODE_ENV: JSON.stringify(ENV)
-            }
-        }),
-    ],
+    plugins,
     externals: {
         'zepto':'$'
     },

@@ -7,6 +7,5 @@
     }],
     "react"
   ],
-  "plugins": ["transform-runtime", "transform-decorators-legacy"],
-  "cacheDirectory": true
+  "plugins": ["transform-runtime", "transform-decorators-legacy"]
 }
