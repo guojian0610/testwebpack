@@ -10,10 +10,12 @@ import webpack, {
     HashedModuleIdsPlugin
 } from 'webpack'
 import CleanWebpackPlugin from 'clean-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 const {UglifyJsPlugin, CommonsChunkPlugin} = webpack.optimize
 // Defining config variables
 // ================================================================================
 const BUILD_PATH = path.join(__dirname, 'build');
+const PUBLIC_PATH = path.join(__dirname, 'public');
 const ENV = process.env.NODE_ENV || 'development'
 const entry = {
     vendor: ['react','react-dom'],
@@ -33,6 +35,14 @@ let rules = [
     }
 ];
 
+const htmlPluginDefine = {
+    template: path.join(PUBLIC_PATH, 'index.ejs'),
+    title: 'Test webpack',
+    inject: false,
+    baseHref: '/',
+    appMountId: 'ReactApp',
+};
+
 let plugins = [
     new DefinePlugin({
         'process.env': {
@@ -46,6 +56,12 @@ let plugins = [
           verbose:  true,        　　　　　　　　　　//开启在控制台输出信息
           dry:      false        　　　　　　　　　　//启用删除文件
         }
+    ),
+    new HtmlWebpackPlugin(
+        Object.assign(htmlPluginDefine, {
+            baseHref:'/build/',
+            filename: 'index.html',
+        })
     )
 ];
 
